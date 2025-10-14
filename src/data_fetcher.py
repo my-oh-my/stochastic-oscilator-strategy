@@ -30,4 +30,10 @@ def fetch_market_data(symbol: str, period: str, interval: str) -> pd.DataFrame:
     if "Date" in data.columns:
         data.rename(columns={"Date": "Datetime"}, inplace=True)
 
+    # Ensure the 'Datetime' column is timezone-aware and set to UTC
+    if data["Datetime"].dt.tz is None:
+        data["Datetime"] = data["Datetime"].dt.tz_localize("UTC")
+    else:
+        data["Datetime"] = data["Datetime"].dt.tz_convert("UTC")
+
     return data
