@@ -79,8 +79,9 @@ def run(args: argparse.Namespace):
                 break  # Stop processing other intervals for this symbol
 
         if all_intervals_processed and stochastic_data_all_intervals:
-            print(f"Checking conditions for {symbol}...")
-            if _check_last_candle_condition(stochastic_data_all_intervals):
+            if args.plot_all or _check_last_candle_condition(
+                stochastic_data_all_intervals
+            ):
                 print(f"Condition met for {symbol}. Generating chart...")
                 generate_stochastic_chart(
                     symbol, stochastic_data_all_intervals, args.save_html

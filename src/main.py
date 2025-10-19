@@ -182,6 +182,11 @@ if __name__ == "__main__":
         help="Save the chart as an HTML file instead of opening it.",
     )
     parser.add_argument(
+        "--plot-all",
+        action="store_true",
+        help="Plot a chart for every symbol, regardless of conditions.",
+    )
+    parser.add_argument(
         "--k-window",
         type=int,
         default=14,
