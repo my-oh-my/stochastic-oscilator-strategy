@@ -37,7 +37,7 @@ def test_fetch_market_data_success(_mock_yfinance_download):
         result,
         pd.DataFrame(
             {
-                "Datetime": pd.to_datetime(["2023-01-01"]),
+                "Datetime": pd.to_datetime(["2023-01-01"]).tz_localize("UTC"),
                 "Open": [100],
                 "High": [105],
                 "Low": [95],
@@ -46,6 +46,55 @@ def test_fetch_market_data_success(_mock_yfinance_download):
             }
         ),
     )
+
+
+def test_fetch_market_data_with_date_column(_mock_yfinance_download):
+    """Test that the 'Date' column is correctly renamed to 'Datetime'."""
+    # Arrange
+    mock_data = pd.DataFrame(
+        {
+            ("Open", ""): [100],
+            ("High", ""): [105],
+            ("Low", ""): [95],
+            ("Close", ""): [102],
+            ("Volume", ""): [1000],
+        },
+        index=pd.to_datetime(["2023-01-01"]),
+    )
+    mock_data.index.name = "Date"  # Set index name to 'Date'
+    _mock_yfinance_download.return_value = mock_data
+
+    # Act
+    result = fetch_market_data("BTC-USD", "1d", "1h")
+
+    # Assert
+    assert "Datetime" in result.columns
+    assert "Date" not in result.columns
+
+
+def test_fetch_market_data_with_tz_aware_datetime(_mock_yfinance_download):
+    """Test that a timezone-aware Datetime column is correctly converted to UTC."""
+    # Arrange
+    mock_data = pd.DataFrame(
+        {
+            ("Open", ""): [100],
+            ("High", ""): [105],
+            ("Low", ""): [95],
+            ("Close", ""): [102],
+            ("Volume", ""): [1000],
+        },
+        index=pd.to_datetime(["2023-01-01"]).tz_localize(
+            "America/New_York"
+        ),  # Set a non-UTC timezone
+    )
+    mock_data.index.name = "Datetime"
+    _mock_yfinance_download.return_value = mock_data
+
+    # Act
+    result = fetch_market_data("BTC-USD", "1d", "1h")
+
+    # Assert
+    assert str(result["Datetime"].dt.tz) == "UTC"
 
 
 def test_fetch_market_data_no_data_none(_mock_yfinance_download):
