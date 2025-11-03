@@ -177,11 +177,6 @@ if __name__ == "__main__":
         help="Comma-separated list of intervals (e.g., '1m,5m,1h').",
     )
     parser.add_argument(
-        "--save-html",
-        action="store_true",
-        help="Save the chart as an HTML file instead of opening it.",
-    )
-    parser.add_argument(
         "--plot-all",
         action="store_true",
         help="Plot a chart for every symbol, regardless of conditions.",
@@ -197,6 +192,12 @@ if __name__ == "__main__":
         type=int,
         default=3,
         help="The window size for the %D line (smoothing) in the Stochastic Oscillator.",
+    )
+    parser.add_argument(
+        "--save-html-dir",
+        type=str,
+        default=None,
+        help="Save the chart as an HTML file in the specified directory.",
     )
     args = parser.parse_args()
     run(args)

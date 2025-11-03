@@ -1,5 +1,6 @@
 """Module for generating charts."""
 
+import os
 import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -69,7 +70,9 @@ def _add_colored_ranges(
 
 
 def generate_stochastic_chart(
-    symbol: str, data_dict: dict[str, pd.DataFrame], save_only: bool = False
+    symbol: str,
+    data_dict: dict[str, pd.DataFrame],
+    output_dir: str | None = None,
 ):
     """Generates and either saves or displays a stochastic chart with a candlestick subplot.
 
@@ -77,8 +80,8 @@ def generate_stochastic_chart(
         symbol: The market symbol (e.g., "BTC-USD").
         data_dict: A dictionary where keys are intervals (e.g., "1h")
                    and values are DataFrames with stochastic data.
-        save_only: If True, saves the chart as an HTML file.
-                   If False, opens the chart in a web browser.
+        output_dir: If provided, saves the chart as an HTML file in this directory.
+                    If None, opens the chart in a web browser.
     """
     if not data_dict:
         print("No data to plot.")
@@ -186,8 +189,11 @@ def generate_stochastic_chart(
 
     _add_colored_ranges(fig, merged_df, list(data_dict.keys()))
 
-    if save_only:
-        chart_filename = f"{symbol.replace('/', '_')}_stochastic_chart.html"
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+        chart_filename = os.path.join(
+            output_dir, f"{symbol.replace('/', '_')}_stochastic_chart.html"
+        )
         fig.write_html(chart_filename)
         print(f"Chart saved to {chart_filename}")
     else:

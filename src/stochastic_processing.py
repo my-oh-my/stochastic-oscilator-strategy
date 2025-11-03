@@ -84,7 +84,9 @@ def run(args: argparse.Namespace):
             ):
                 print(f"Condition met for {symbol}. Generating chart...")
                 generate_stochastic_chart(
-                    symbol, stochastic_data_all_intervals, args.save_html
+                    symbol,
+                    stochastic_data_all_intervals,
+                    output_dir=args.save_html_dir,
                 )
             else:
                 print(f"Condition not met for {symbol}. No chart will be generated.")

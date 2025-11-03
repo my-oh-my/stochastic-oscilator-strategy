@@ -110,11 +110,13 @@ def test_add_colored_ranges_last_candle():
 
 
 @patch("src.chart_generator.make_subplots")
-def test_generate_stochastic_chart_save_only(mock_make_subplots):
-    """Test that generate_stochastic_chart saves the chart when save_only is True."""
+def test_generate_stochastic_chart_save_only(mock_make_subplots, tmp_path):
+    """Test that generate_stochastic_chart saves the chart when output_dir is provided."""
     # Arrange
     mock_fig = MagicMock()
     mock_make_subplots.return_value = mock_fig
+    output_dir = tmp_path / "charts"
+    output_dir.mkdir()
 
     data_dict = {
         "1h": pd.DataFrame(
@@ -131,16 +133,17 @@ def test_generate_stochastic_chart_save_only(mock_make_subplots):
     }
 
     # Act
-    generate_stochastic_chart("BTC/USD", data_dict, save_only=True)
+    generate_stochastic_chart("BTC/USD", data_dict, output_dir=str(output_dir))
 
     # Assert
-    mock_fig.write_html.assert_called_once_with("BTC_USD_stochastic_chart.html")
+    expected_path = output_dir / "BTC_USD_stochastic_chart.html"
+    mock_fig.write_html.assert_called_once_with(str(expected_path))
     mock_fig.show.assert_not_called()
 
 
 @patch("src.chart_generator.make_subplots")
 def test_generate_stochastic_chart_show(mock_make_subplots):
-    """Test that generate_stochastic_chart shows the chart when save_only is False."""
+    """Test that generate_stochastic_chart shows the chart when output_dir is None."""
     # Arrange
     mock_fig = MagicMock()
     mock_make_subplots.return_value = mock_fig
@@ -160,7 +163,7 @@ def test_generate_stochastic_chart_show(mock_make_subplots):
     }
 
     # Act
-    generate_stochastic_chart("BTC-USD", data_dict, save_only=False)
+    generate_stochastic_chart("BTC-USD", data_dict)
 
     # Assert
     mock_fig.show.assert_called_once()
@@ -200,13 +203,13 @@ def test_generate_stochastic_chart_multiple_intervals(mock_make_subplots):
     }
 
     # Act
-    generate_stochastic_chart("BTC-USD", data_dict, save_only=False)
+    generate_stochastic_chart("BTC-USD", data_dict)
 
     # Assert
     assert mock_fig.add_trace.call_count == 5
 
 
-def test_generate_stochastic_chart_no_data():
+def test_generate_stochastic_chart_no_data(tmp_path):
     """Test that generate_stochastic_chart handles an empty data_dict gracefully."""
     # Act & Assert (should not raise an error)
-    generate_stochastic_chart("BTC-USD", {}, save_only=True)
+    generate_stochastic_chart("BTC-USD", {}, output_dir=str(tmp_path))

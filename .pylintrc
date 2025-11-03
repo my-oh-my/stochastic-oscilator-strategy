@@ -1,4 +1,8 @@
+[MASTER]
+init-hook='import sys; sys.path.insert(0, ".")'
+
 [MAIN]
+ignored-modules=airflow.*
 
 [FORMAT]
 max-line-length = 120
