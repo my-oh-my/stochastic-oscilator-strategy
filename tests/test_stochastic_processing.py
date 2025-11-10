@@ -92,18 +92,20 @@ def test_calculate_stochastic_success(_sample_market_data):
 
     # Act
     result = calculate_stochastic(data, k_window=14, d_window=3)
-
+    print(result)
     # Assert
     assert "%K" in result.columns
     assert "%D" in result.columns
     assert not result["%K"].isnull().all()
     assert not result["%D"].isnull().all()
 
-    # Check the last values (based on a 14-period window and 3-period smoothing)
-    # These values can be pre-calculated or verified with a trusted source
-    # For this example, we'll just check if they are within a reasonable range (0-100)
-    assert (result["%K"].iloc[-1] >= 0) and (result["%K"].iloc[-1] <= 100)
-    assert (result["%D"].iloc[-1] >= 0) and (result["%D"].iloc[-1] <= 100)
+    # Check the last values
+    pd.testing.assert_series_equal(
+        result[["%K", "%D"]].iloc[-1],
+        pd.Series({"%K": 52.380952, "%D": 53.968254}),
+        check_names=False,
+        atol=1e-6,
+    )
 
 
 def test_calculate_stochastic_empty_data():
@@ -187,6 +189,7 @@ def test_run_condition_met_generates_chart(mocker):
         plot_all=False,
         k_window=14,
         d_window=3,
+        save_html_dir=None,
     )
 
     # Act
@@ -259,6 +262,7 @@ def test_run_plot_all_generates_chart(mocker):
         plot_all=True,  # Key change here
         k_window=14,
         d_window=3,
+        save_html_dir=None,
     )
 
     # Act
